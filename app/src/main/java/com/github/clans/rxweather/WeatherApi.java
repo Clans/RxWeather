@@ -1,6 +1,7 @@
 package com.github.clans.rxweather;
 
 import com.github.clans.rxweather.models.CurrentWeather;
+import com.github.clans.rxweather.models.WeatherForecastEnvelope;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -28,9 +29,16 @@ public class WeatherApi {
         return mWeatherService.getCurrentWeather(lat, lon);
     }
 
+    public Observable<WeatherForecastEnvelope> getWeatherForecast(double lat, double lon) {
+        return mWeatherService.getWeatherForecast(lat, lon);
+    }
+
     private interface WeatherService {
 
         @GET("weather?units=metric&mode=json&appid=8214ce54696c9025fb5264abfbef7096")
         Observable<CurrentWeather> getCurrentWeather(@Query("lat") double lat, @Query("lon") double lon);
+
+        @GET("forecast/daily?mode=json&units=metric&cnt=7&appid=8214ce54696c9025fb5264abfbef7096")
+        Observable<WeatherForecastEnvelope> getWeatherForecast(@Query("lat") double lat, @Query("lon") double lon);
     }
 }

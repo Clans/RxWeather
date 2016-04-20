@@ -17,7 +17,6 @@ public class WeatherForecast {
     private int windDirection;
 
     class Temp {
-
         public float morn;
         public float day;
         public float eve;
@@ -30,5 +29,21 @@ public class WeatherForecast {
         public int id;
         public String description;
         public String icon;
+    }
+
+    public long getTimestamp() {
+        return dt;
+    }
+
+    public String getConditions() {
+        return weather.get(0).description;
+    }
+
+    public float getMaxTemp() {
+        return temp.max;
+    }
+
+    public float getMinTemp() {
+        return temp.min;
     }
 }

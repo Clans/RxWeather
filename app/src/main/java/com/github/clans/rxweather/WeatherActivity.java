@@ -8,11 +8,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.github.clans.rxweather.models.CurrentWeather;
+import com.github.clans.rxweather.models.WeatherData;
+import com.github.clans.rxweather.models.WeatherForecastEnvelope;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -23,6 +27,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -64,22 +69,32 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         super.onStop();
     }
 
-    private void requestUserLocation() {
+    private void loadData() {
         LocationHelper locationHelper = new LocationHelper(this, mGoogleApiClient);
         locationHelper.getLocation()
                 .timeout(LOCATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .flatMap(new Func1<Location, Observable<CurrentWeather>>() {
+                .flatMap(new Func1<Location, Observable<WeatherData>>() {
                     @Override
-                    public Observable<CurrentWeather> call(Location location) {
+                    public Observable<WeatherData> call(Location location) {
                         WeatherApi weatherApi = new WeatherApi();
-                        return weatherApi.getCurrentWeather(location.getLatitude(), location.getLongitude())
+                        double lat = location.getLatitude();
+                        double lon = location.getLongitude();
+                        return Observable.zip(
+                                weatherApi.getCurrentWeather(lat, lon),
+                                weatherApi.getWeatherForecast(lat, lon),
+                                new Func2<CurrentWeather, WeatherForecastEnvelope, WeatherData>() {
+                                    @Override
+                                    public WeatherData call(CurrentWeather currentWeather, WeatherForecastEnvelope weatherForecastEnvelope) {
+                                        return new WeatherData(currentWeather, weatherForecastEnvelope.getWeatherForecast());
+                                    }
+                                })
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread());
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<CurrentWeather>() {
+                .subscribe(new Subscriber<WeatherData>() {
                     @Override
                     public void onCompleted() {
 
@@ -91,20 +106,18 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                     }
 
                     @Override
-                    public void onNext(CurrentWeather currentWeather) {
-                        updateUi(currentWeather);
+                    public void onNext(WeatherData weatherData) {
+                        updateUi(weatherData);
                     }
                 });
     }
 
-    private void updateUi(CurrentWeather currentWeather) {
-        TextView locationName = (TextView) findViewById(R.id.locationName);
-        TextView currentConditions = (TextView) findViewById(R.id.currentConditions);
-        TextView temp = (TextView) findViewById(R.id.temp);
-
-        locationName.setText(currentWeather.getLocationName());
-        currentConditions.setText(currentWeather.getCurrentConditions());
-        temp.setText(currentWeather.getCurrentTemp());
+    private void updateUi(WeatherData weatherData) {
+        RecyclerView list = (RecyclerView) findViewById(R.id.list);
+        list.setHasFixedSize(true);
+        list.setLayoutManager(new LinearLayoutManager(this));
+        list.addItemDecoration(new DividerItemDecoration(this, R.drawable.list_divider));
+        list.setAdapter(new WeatherForecastAdapter(weatherData));
 
         findViewById(R.id.loadingIndicator).setVisibility(View.GONE);
     }
@@ -115,7 +128,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         switch (requestCode) {
             case PERMISSION_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    requestUserLocation();
+                    loadData();
                 } else {
 
                 }
@@ -131,7 +144,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_LOCATION);
         } else {
-            requestUserLocation();
+            loadData();
         }
     }
 
