@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -116,8 +117,17 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         RecyclerView list = (RecyclerView) findViewById(R.id.list);
         list.setHasFixedSize(true);
         list.setLayoutManager(new LinearLayoutManager(this));
-        list.addItemDecoration(new DividerItemDecoration(this, R.drawable.list_divider));
-        list.setAdapter(new WeatherForecastAdapter(weatherData));
+//        list.addItemDecoration(new DividerItemDecoration(this, R.drawable.list_divider));
+        final WeatherForecastAdapter forecastAdapter = new WeatherForecastAdapter(weatherData);
+        list.setAdapter(forecastAdapter);
+        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    forecastAdapter.setAnimationsLocked(true);
+                }
+            }
+        });
 
         findViewById(R.id.loadingIndicator).setVisibility(View.GONE);
     }

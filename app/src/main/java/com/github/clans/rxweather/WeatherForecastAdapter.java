@@ -1,9 +1,12 @@
 package com.github.clans.rxweather;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import com.github.clans.rxweather.models.CurrentWeather;
@@ -19,6 +22,8 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private List<WeatherForecast> forecast;
     private CurrentWeather currentWeather;
+    private int lastAnimatedPosition = -1;
+    private boolean animationsLocked = false;
 
     public WeatherForecastAdapter(WeatherData weatherData) {
         this.forecast = weatherData.getWeatherForecast();
@@ -75,6 +80,8 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             vhh.currentConditions.setText(currentWeather.getCurrentConditions());
             vhh.temp.setText(currentWeather.getCurrentTemp());
         } else {
+            runEnterAnimation(holder.itemView, position);
+
             WeatherForecast forecast = getForecastItem(position);
             if (forecast != null) {
                 ViewHolderItem vhi = (ViewHolderItem) holder;
@@ -99,7 +106,34 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         return TYPE_ITEM;
     }
 
+    private void runEnterAnimation(View view, int position) {
+        if (animationsLocked) return;
+
+        if (position > lastAnimatedPosition) {
+            lastAnimatedPosition = position;
+            view.setTranslationY(200);
+            view.setAlpha(0.f);
+            view.animate()
+                    .translationY(0)
+                    .alpha(1f)
+                    .setStartDelay(30 * position)
+                    .setInterpolator(new DecelerateInterpolator(2.f))
+                    .setDuration(400)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            animationsLocked = true;
+                        }
+                    })
+                    .start();
+        }
+    }
+
     private WeatherForecast getForecastItem(int position) {
         return this.forecast.get(--position);
+    }
+
+    public void setAnimationsLocked(boolean animationsLocked) {
+        this.animationsLocked = animationsLocked;
     }
 }
