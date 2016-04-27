@@ -136,4 +136,10 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void setAnimationsLocked(boolean animationsLocked) {
         this.animationsLocked = animationsLocked;
     }
+
+    public void update(WeatherData weatherData) {
+        this.forecast = weatherData.getWeatherForecast();
+        this.currentWeather = weatherData.getCurrentWeather();
+        notifyDataSetChanged();
+    }
 }

@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -16,6 +15,11 @@ import rx.Observable;
 import rx.Subscriber;
 
 public class LocationHelper {
+
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
+            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    public static final long LOCATION_REQUEST_TIMEOUT = 5000;
 
     private final Context mContext;
     private final GoogleApiClient mGoogleApiClient;
@@ -37,35 +41,24 @@ public class LocationHelper {
                 final Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (location != null) {
                     subscriber.onNext(location);
-                    subscriber.onCompleted();
-                } else {
-                    LocationRequest locationRequest = new LocationRequest();
-                    locationRequest.setNumUpdates(1);
-                    locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                    locationRequest.setMaxWaitTime(2000);
+//                    subscriber.onCompleted();
+                }
 
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
-                            locationRequest, new LocationListener() {
-                                @Override
-                                public void onLocationChanged(Location location) {
-                                    subscriber.onNext(location);
-                                    subscriber.onCompleted();
-                                }
-                            });
+                LocationRequest locationRequest = new LocationRequest();
+                locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+                locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+                locationRequest.setNumUpdates(1);
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                locationRequest.setMaxWaitTime(LOCATION_REQUEST_TIMEOUT);
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Location defaultLocation = new Location("");
-                            defaultLocation.setLatitude(37.422);
-                            defaultLocation.setLongitude(-122.084);
-                            if (!subscriber.isUnsubscribed()) {
-                                subscriber.onNext(defaultLocation);
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                        locationRequest, new LocationListener() {
+                            @Override
+                            public void onLocationChanged(Location location) {
+                                subscriber.onNext(location);
                                 subscriber.onCompleted();
                             }
-                        }
-                    }, 2100);
-                }
+                        });
             }
         });
     }

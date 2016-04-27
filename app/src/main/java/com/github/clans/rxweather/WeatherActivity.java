@@ -46,11 +46,12 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     private CompositeSubscription mCompositeSubscription;
     private DiskCacheManager mDiskCache;
     private View mLoadingIndicator;
+    private WeatherForecastAdapter mForecastAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.weather_activity);
 
         mCompositeSubscription = new CompositeSubscription();
         try {
@@ -84,7 +85,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     private void loadData() {
-        // TODO: test rotation for long running request
         LocationHelper locationHelper = new LocationHelper(this, mGoogleApiClient);
         Subscription subscription = locationHelper.getLocation()
                 .timeout(LOCATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -103,15 +103,19 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                                                 @Override
                                                 public Boolean call(WeatherData weatherData) {
                                                     if (weatherData == null) return false;
+
                                                     long currentTimestamp = timestampedLocation.getTimestampMillis();
                                                     long weatherTimestamp = weatherData.getTimestamp();
+
                                                     Calendar currentCal = Calendar.getInstance();
                                                     currentCal.setTimeInMillis(currentTimestamp);
 
                                                     Calendar cachedCal = Calendar.getInstance();
                                                     cachedCal.setTimeInMillis(weatherTimestamp);
+
                                                     int cachedHourOfDay = cachedCal.get(Calendar.HOUR_OF_DAY);
                                                     int currentHourOfDay = currentCal.get(Calendar.HOUR_OF_DAY);
+
                                                     return Math.abs(currentHourOfDay - cachedHourOfDay) <= 2;
 
                                                 }
@@ -175,13 +179,18 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         list.setHasFixedSize(true);
         list.setLayoutManager(new LinearLayoutManager(this));
 //        list.addItemDecoration(new DividerItemDecoration(this, R.drawable.list_divider));
-        final WeatherForecastAdapter forecastAdapter = new WeatherForecastAdapter(weatherData);
-        list.setAdapter(forecastAdapter);
+        if (list.getAdapter() == null) {
+            mForecastAdapter = new WeatherForecastAdapter(weatherData);
+            list.setAdapter(mForecastAdapter);
+        } else {
+            mForecastAdapter.update(weatherData);
+        }
+
         list.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    forecastAdapter.setAnimationsLocked(true);
+                    mForecastAdapter.setAnimationsLocked(true);
                 }
             }
         });
@@ -211,11 +220,9 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_LOCATION);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
         } else {
             loadData();
         }
