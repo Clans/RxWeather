@@ -1,4 +1,4 @@
-package com.github.clans.rxweather;
+package com.github.clans.rxweather.api;
 
 import com.github.clans.rxweather.models.CurrentWeather;
 import com.github.clans.rxweather.models.WeatherForecastEnvelope;
@@ -13,6 +13,7 @@ import rx.Observable;
 public class WeatherApi {
 
     private static final String BASE_URL = "http://api.openweathermap.org/data/2.5/";
+    private static final String APP_ID = "8214ce54696c9025fb5264abfbef7096";
 
     private WeatherService mWeatherService;
 
@@ -35,10 +36,10 @@ public class WeatherApi {
 
     private interface WeatherService {
 
-        @GET("weather?units=metric&mode=json&appid=8214ce54696c9025fb5264abfbef7096")
+        @GET("weather?units=metric&mode=json&appid=" + APP_ID)
         Observable<CurrentWeather> getCurrentWeather(@Query("lat") double lat, @Query("lon") double lon);
 
-        @GET("forecast/daily?mode=json&units=metric&cnt=7&appid=8214ce54696c9025fb5264abfbef7096")
+        @GET("forecast/daily?mode=json&units=metric&cnt=7&appid=" + APP_ID)
         Observable<WeatherForecastEnvelope> getWeatherForecast(@Query("lat") double lat, @Query("lon") double lon);
     }
 }

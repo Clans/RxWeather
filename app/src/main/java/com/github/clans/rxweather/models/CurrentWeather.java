@@ -11,10 +11,6 @@ public class CurrentWeather {
     private ArrayList<Weather> weather;
     private Main main;
 
-    class Weather {
-        public String description;
-    }
-
     class Main {
         public float temp;
         @SerializedName("temp_min")
@@ -28,10 +24,18 @@ public class CurrentWeather {
     }
 
     public String getCurrentConditions() {
-        return weather.size() > 0 ? weather.get(0).description : "";
+        return weather.size() > 0 ? weather.get(0).getDescription() : "";
     }
 
     public String getCurrentTemp() {
         return TempFormatter.format(main.temp);
+    }
+
+    public int getWeatherId() {
+        return weather.get(0).getId();
+    }
+
+    public String getIcon() {
+        return weather.get(0).getIcon();
     }
 }

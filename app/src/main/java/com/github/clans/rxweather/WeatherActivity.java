@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.github.clans.rxweather.api.WeatherApi;
 import com.github.clans.rxweather.models.CurrentWeather;
 import com.github.clans.rxweather.models.WeatherData;
 import com.github.clans.rxweather.models.WeatherForecastEnvelope;
@@ -85,6 +86,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     private void loadData() {
+        // TODO: try Android-ReactiveLocation
         LocationHelper locationHelper = new LocationHelper(this, mGoogleApiClient);
         Subscription subscription = locationHelper.getLocation()
                 .timeout(LOCATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -102,21 +104,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                                             .filter(new Func1<WeatherData, Boolean>() {
                                                 @Override
                                                 public Boolean call(WeatherData weatherData) {
-                                                    if (weatherData == null) return false;
-
-                                                    long currentTimestamp = timestampedLocation.getTimestampMillis();
-                                                    long weatherTimestamp = weatherData.getTimestamp();
-
-                                                    Calendar currentCal = Calendar.getInstance();
-                                                    currentCal.setTimeInMillis(currentTimestamp);
-
-                                                    Calendar cachedCal = Calendar.getInstance();
-                                                    cachedCal.setTimeInMillis(weatherTimestamp);
-
-                                                    int cachedHourOfDay = cachedCal.get(Calendar.HOUR_OF_DAY);
-                                                    int currentHourOfDay = currentCal.get(Calendar.HOUR_OF_DAY);
-
-                                                    return Math.abs(currentHourOfDay - cachedHourOfDay) <= 2;
+                                                    return useCachedData(weatherData, timestampedLocation.getTimestampMillis());
 
                                                 }
                                             }),
@@ -174,6 +162,23 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         mCompositeSubscription.add(subscription);
     }
 
+    private boolean useCachedData(WeatherData weatherData, long currentTimestamp) {
+        if (weatherData == null) return false;
+
+        long weatherTimestamp = weatherData.getTimestamp();
+
+        Calendar currentCal = Calendar.getInstance();
+        currentCal.setTimeInMillis(currentTimestamp);
+
+        Calendar cachedCal = Calendar.getInstance();
+        cachedCal.setTimeInMillis(weatherTimestamp);
+
+        int cachedHourOfDay = cachedCal.get(Calendar.HOUR_OF_DAY);
+        int currentHourOfDay = currentCal.get(Calendar.HOUR_OF_DAY);
+
+        return Math.abs(currentHourOfDay - cachedHourOfDay) <= 2;
+    }
+
     private void updateUi(WeatherData weatherData) {
         RecyclerView list = (RecyclerView) findViewById(R.id.list);
         list.setHasFixedSize(true);
@@ -213,6 +218,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                     loadData();
                 } else {
                     // TODO: handle deny
+                    hideLoadingIndicator();
                 }
         }
     }

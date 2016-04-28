@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.clans.rxweather.models.CurrentWeather;
@@ -36,6 +37,7 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         private TextView conditions;
         private TextView maxTemp;
         private TextView minTemp;
+        private ImageView icon;
 
         public ViewHolderItem(View itemView) {
             super(itemView);
@@ -43,6 +45,7 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             conditions = (TextView) itemView.findViewById(R.id.conditions);
             maxTemp = (TextView) itemView.findViewById(R.id.maxTemp);
             minTemp = (TextView) itemView.findViewById(R.id.minTemp);
+            icon = (ImageView) itemView.findViewById(R.id.icon);
         }
     }
 
@@ -51,12 +54,14 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         private TextView locationName;
         private TextView currentConditions;
         private TextView temp;
+        private ImageView icon;
 
         public ViewHolderHeader(View itemView) {
             super(itemView);
             locationName = (TextView) itemView.findViewById(R.id.locationName);
             currentConditions = (TextView) itemView.findViewById(R.id.currentConditions);
             temp = (TextView) itemView.findViewById(R.id.temp);
+            icon = (ImageView) itemView.findViewById(R.id.icon);
         }
     }
 
@@ -79,6 +84,8 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             vhh.locationName.setText(currentWeather.getLocationName());
             vhh.currentConditions.setText(currentWeather.getCurrentConditions());
             vhh.temp.setText(currentWeather.getCurrentTemp());
+            vhh.icon.setImageResource(WeatherIconMapper.getWeatherIconRes(currentWeather.getWeatherId(),
+                    currentWeather.getIcon()));
         } else {
             runEnterAnimation(holder.itemView, position);
 
@@ -89,6 +96,8 @@ public class WeatherForecastAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 vhi.conditions.setText(forecast.getConditions());
                 vhi.maxTemp.setText(TempFormatter.format(forecast.getMaxTemp()));
                 vhi.minTemp.setText(TempFormatter.format(forecast.getMinTemp()));
+                vhi.icon.setImageResource(WeatherIconMapper.getWeatherIconRes(forecast.getWeatherId(),
+                        forecast.getIcon()));
             }
         }
     }

@@ -25,18 +25,12 @@ public class WeatherForecast {
         public float max;
     }
 
-    class Weather {
-        public int id;
-        public String description;
-        public String icon;
-    }
-
     public long getTimestamp() {
         return dt;
     }
 
     public String getConditions() {
-        return weather.get(0).description;
+        return weather.get(0).getDescription();
     }
 
     public float getMaxTemp() {
@@ -45,5 +39,13 @@ public class WeatherForecast {
 
     public float getMinTemp() {
         return temp.min;
+    }
+
+    public int getWeatherId() {
+        return weather.get(0).getId();
+    }
+
+    public String getIcon() {
+        return weather.get(0).getIcon();
     }
 }

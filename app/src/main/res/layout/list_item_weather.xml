@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="48dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center_vertical">
 
     <TextView
         android:id="@+id/day"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="4"
+        android:layout_weight="3"
         android:textColor="@color/black"
         android:textAllCaps="true"
         android:textSize="12sp"
@@ -19,8 +20,16 @@
         android:id="@+id/conditions"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="5"
+        android:layout_weight="4"
         tools:text="sky is clear" />
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="2"
+        app:srcCompat="@drawable/ic_weather_sun"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/maxTemp"
