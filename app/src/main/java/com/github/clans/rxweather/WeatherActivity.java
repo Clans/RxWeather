@@ -36,10 +36,10 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.schedulers.Timestamped;
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = WeatherActivity.class.getSimpleName();
     private static final int PERMISSION_LOCATION = 100;
     private static final long LOCATION_TIMEOUT_SECONDS = 10;
 
@@ -58,7 +58,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         try {
             mDiskCache = DiskCacheManager.open(getCacheDir());
         } catch (IOException e) {
-            Log.d(TAG, "Failed initializing disk cache.");
+            Timber.d("Failed initializing disk cache.");
         }
 
         if (mGoogleApiClient == null) {
@@ -126,7 +126,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                                                         try {
                                                             mDiskCache.put(location, weatherData);
                                                         } catch (IOException e) {
-                                                            Log.d(TAG, "Error putting response into cache: " + e.getMessage());
+                                                            Timber.d("Error putting response into cache: %s", e.getMessage());
                                                         }
                                                     }
                                                 }
@@ -144,12 +144,12 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                 .subscribe(new Subscriber<WeatherData>() {
                     @Override
                     public void onCompleted() {
-                        Log.d(TAG, "onCompleted: ");
+                        Timber.d("onCompleted()");
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(TAG, "onError: " + e.getMessage());
+                        Timber.d("onError: %s", e.getMessage());
                         hideLoadingIndicator();
                     }
 
