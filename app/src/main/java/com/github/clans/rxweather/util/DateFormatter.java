@@ -1,4 +1,4 @@
-package com.github.clans.rxweather;
+package com.github.clans.rxweather.util;
 
 import android.text.format.DateUtils;
 

@@ -1,4 +1,4 @@
-package com.github.clans.rxweather;
+package com.github.clans.rxweather.adapters;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -10,6 +10,10 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.clans.rxweather.util.DateFormatter;
+import com.github.clans.rxweather.R;
+import com.github.clans.rxweather.util.TempFormatter;
+import com.github.clans.rxweather.util.WeatherIconMapper;
 import com.github.clans.rxweather.models.CurrentWeather;
 import com.github.clans.rxweather.models.WeatherData;
 import com.github.clans.rxweather.models.WeatherForecast;

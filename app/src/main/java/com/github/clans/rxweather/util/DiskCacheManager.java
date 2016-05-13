@@ -29,8 +29,8 @@ public class DiskCacheManager {
         return new DiskCacheManager(directory);
     }
 
-    public synchronized WeatherData get(Location location) throws IOException {
-        String key = getKey(location);
+    public synchronized WeatherData get(double lat, double lon) throws IOException {
+        String key = getKey(lat, lon);
         DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
         if (snapshot != null) {
             String string = snapshot.getString(DISK_CACHE_INDEX);
@@ -42,11 +42,11 @@ public class DiskCacheManager {
         return null;
     }
 
-    public synchronized void put(Location location, WeatherData weatherData) throws IOException {
+    public synchronized void put(double lat, double lon, WeatherData weatherData) throws IOException {
         OutputStream bos = null;
-        DiskLruCache.Editor editor = null;
+        DiskLruCache.Editor editor;
         try {
-            editor = mDiskLruCache.edit(getKey(location));
+            editor = mDiskLruCache.edit(getKey(lat, lon));
             if (editor != null) {
                 bos = editor.newOutputStream(DISK_CACHE_INDEX);
                 String json = mGson.toJson(weatherData);
@@ -64,9 +64,7 @@ public class DiskCacheManager {
         }
     }
 
-    private String getKey(Location location) {
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
+    private String getKey(double latitude, double longitude) {
         double lat = Math.floor(latitude * 1e2) / 1e2;
         double lon = Math.floor(longitude * 1e2) / 1e2;
         String key = lat + "_" + lon;

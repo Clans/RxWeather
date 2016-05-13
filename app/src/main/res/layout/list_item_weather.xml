@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="center_vertical">
+    android:background="@drawable/list_selector"
+    android:gravity="center_vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin">
 
     <TextView
         android:id="@+id/day"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="3"
-        android:textColor="@color/black"
         android:textAllCaps="true"
+        android:textColor="@color/textColorPrimary"
         android:textSize="12sp"
         tools:text="Monday" />
 
@@ -21,6 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="4"
+        android:textColor="@color/textColorSecondary"
         tools:text="sky is clear" />
 
     <ImageView
@@ -38,7 +42,7 @@
         android:layout_weight="1"
         android:gravity="end"
         android:singleLine="true"
-        android:textColor="@color/black"
+        android:textColor="@color/textColorPrimary"
         tools:text="11°" />
 
     <TextView
@@ -48,6 +52,7 @@
         android:layout_weight="1"
         android:gravity="end"
         android:singleLine="true"
+        android:textColor="@color/textColorSecondary"
         tools:text="7°" />
 
 </LinearLayout>

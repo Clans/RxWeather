@@ -1,6 +1,6 @@
 package com.github.clans.rxweather.models;
 
-import com.github.clans.rxweather.TempFormatter;
+import com.github.clans.rxweather.util.TempFormatter;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;

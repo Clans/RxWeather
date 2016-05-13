@@ -1,5 +1,6 @@
-package com.github.clans.rxweather;
+package com.github.clans.rxweather.util;
 
+import com.github.clans.rxweather.R;
 import com.github.clans.rxweather.util.Utils;
 
 public class WeatherIconMapper {
