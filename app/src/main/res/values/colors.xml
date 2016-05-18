@@ -6,9 +6,11 @@
     <color name="tempAccent">#03A9F4</color>
     <color name="textColorPrimary">#000</color>
     <color name="textColorSecondary">#757575</color>
+    <color name="lightGray">#E1E1E1</color>
     <color name="gray">#656565</color>
     <color name="dividerColor">#ccc</color>
     <color name="weatherIconsColor">#FF000000</color>
     <color name="transparent">#00000000</color>
     <color name="blackAlpha12">#1F000000</color>
+    <color name="background_light">#FAFAFA</color>
 </resources>

@@ -41,7 +41,7 @@ public class LocationHelper {
                 final Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (location != null) {
                     subscriber.onNext(location);
-//                    subscriber.onCompleted();
+                    subscriber.onCompleted();
                 }
 
                 LocationRequest locationRequest = new LocationRequest();
@@ -55,8 +55,8 @@ public class LocationHelper {
                         locationRequest, new LocationListener() {
                             @Override
                             public void onLocationChanged(Location location) {
-                                subscriber.onNext(location);
-                                subscriber.onCompleted();
+//                                subscriber.onNext(location);
+//                                subscriber.onCompleted();
                             }
                         });
             }

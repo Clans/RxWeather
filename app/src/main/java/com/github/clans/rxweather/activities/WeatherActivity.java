@@ -6,7 +6,6 @@ import android.animation.PropertyValuesHolder;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +18,7 @@ import android.view.animation.OvershootInterpolator;
 
 import com.github.clans.rxweather.LocationHelper;
 import com.github.clans.rxweather.R;
+import com.github.clans.rxweather.WeatherItemAnimator;
 import com.github.clans.rxweather.adapters.WeatherForecastAdapter;
 import com.github.clans.rxweather.api.WeatherApi;
 import com.github.clans.rxweather.dialogs.AddLocationDialogFragment;
@@ -63,7 +63,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     private DiskCacheManager mDiskCache;
     private View mLoadingIndicator;
     private WeatherForecastAdapter mForecastAdapter;
-    private int mScrollOffset = 4;
     private FloatingActionButton fab;
     private boolean animate;
     private WeatherApi weatherApi;
@@ -125,28 +124,26 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+                .subscribe(new Subscriber<WeatherData>() {
+                    @Override
+                    public void onCompleted() {
+                        Timber.d("onCompleted()");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.d("onError: %s", e.getMessage());
+                        hideLoadingIndicator();
+                    }
+
+                    @Override
+                    public void onNext(WeatherData weatherData) {
+                        updateUi(weatherData);
+                    }
+                });
 
         mCompositeSubscription.add(subscription);
     }
-
-    private Subscriber<WeatherData> subscriber = new Subscriber<WeatherData>() {
-        @Override
-        public void onCompleted() {
-            Timber.d("onCompleted()");
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            Timber.d("onError: %s", e.getMessage());
-            hideLoadingIndicator();
-        }
-
-        @Override
-        public void onNext(WeatherData weatherData) {
-            updateUi(weatherData);
-        }
-    };
 
     private boolean useCachedData(WeatherData weatherData, long currentTimestamp) {
         if (weatherData == null) return false;
@@ -212,6 +209,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         RecyclerView list = (RecyclerView) findViewById(R.id.list);
         list.setHasFixedSize(true);
         list.setLayoutManager(new LinearLayoutManager(this));
+        list.setItemAnimator(new WeatherItemAnimator());
 //        list.addItemDecoration(new DividerItemDecoration(this, R.drawable.list_divider));
         if (list.getAdapter() == null) {
             mForecastAdapter = new WeatherForecastAdapter(weatherData);
@@ -222,31 +220,11 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
             mForecastAdapter.update(weatherData);
         }
 
-        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    mForecastAdapter.setAnimationsLocked(true);
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (Math.abs(dy) > mScrollOffset) {
-                    if (dy > 0) {
-                        fab.hide();
-                    } else {
-                        fab.show();
-                    }
-                }
-            }
-        });
-
         ItemClickSupport.addTo(list).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 Timber.d("Position clicked: %d", position);
+                mForecastAdapter.expandCollapseToggle(position);
             }
         });
 

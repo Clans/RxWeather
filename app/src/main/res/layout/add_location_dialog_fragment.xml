@@ -19,7 +19,7 @@
                 android:id="@+id/locationName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter your city" />
+                android:hint="@string/enter_your_city" />
 
         </android.support.design.widget.TextInputLayout>
 

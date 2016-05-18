@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">RxWeather</string>
+    <string name="enter_your_city">Enter your city</string>
+    <string name="wind">Wind</string>
+    <string name="humidity">Humidity</string>
+    <string name="details">Details</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="pressure">Pressure</string>
 </resources>

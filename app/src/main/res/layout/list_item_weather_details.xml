@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/lightGray"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingLeft="28dp"
+    android:paddingRight="28dp"
+    android:paddingTop="8dp">
+
+    <TableLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <TableRow android:gravity="center_vertical">
+
+            <TextView
+                android:layout_weight="3"
+                android:text="@string/wind"
+                android:textColor="@color/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/wind"
+                android:layout_weight="1"
+                android:textColor="@color/textColorPrimary"
+                tools:text="2.5 m/s NE" />
+        </TableRow>
+
+        <TableRow android:gravity="center_vertical">
+
+            <TextView
+                android:layout_weight="3"
+                android:text="@string/humidity"
+                android:textColor="@color/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/humidity"
+                android:layout_weight="1"
+                android:textColor="@color/textColorPrimary"
+                tools:text="90%" />
+        </TableRow>
+
+        <TableRow android:gravity="center_vertical">
+
+            <TextView
+                android:layout_weight="3"
+                android:text="@string/pressure"
+                android:textColor="@color/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/pressure"
+                android:layout_weight="1"
+                android:textColor="@color/textColorPrimary"
+                tools:text="1003.1 hPa" />
+        </TableRow>
+
+    </TableLayout>
+
+    <ImageButton
+        android:id="@+id/btn_details"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="end|center_vertical"
+        android:background="?selectableItemBackgroundBorderless"
+        app:srcCompat="@drawable/ic_more_horiz" />
+
+</LinearLayout>
